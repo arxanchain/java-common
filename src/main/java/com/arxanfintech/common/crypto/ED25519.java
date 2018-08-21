@@ -37,12 +37,16 @@ public class ED25519 {
      *            base64 payload
      * @return
      */
-    public static String Sign(String nonce, String privatekey, String did, String payload, String SignToolPath) {
+    public static String Sign(String nonce, String privatekey, String did, String payload, Boolean isNeedBase64Encode,
+            String SignToolPath) {
 
         try {
-            Base64.Encoder encoder = Base64.getEncoder();
-            String base64_payload = encoder.encodeToString(payload.getBytes("UTF-8"));
-
+            String base64_payload = payload;
+            if (isNeedBase64Encode) {
+                Base64.Encoder encoder = Base64.getEncoder();
+                base64_payload = encoder.encodeToString(payload.getBytes("UTF-8"));
+            }
+            System.out.println("Sign payload: " + payload + "\r\n  base64_payload: " + base64_payload);
             String signvalue = "";
 
             String cmd = SignToolPath + " -key " + privatekey + " -nonce " + nonce + " -did " + did + " -data "
@@ -53,25 +57,36 @@ public class ED25519 {
 
             signvalue = br.readLine().trim();
 
-            // String FILE_NAME = "sign-util";
-            // System.out.println("MyClass.class.getClassLoder().getResource(FILE_NAME).getPath():"
-            // + ED25519.class.getClassLoader().getResource(FILE_NAME).getPath() + "\r\n"
-            // +
-            // ED25519.class.getClassLoader().getResource("sign-util").getPath().substring(0,
-            // ED25519.class.getClassLoader().getResource("sign-util").getPath().length() -
-            // 9)
-            // + "/../sign2-util");
-            // System.out.println("MyClass.class.getResource(FILE_NAME).getPath(): "
-            // + ED25519.class.getResource(FILE_NAME).getPath());
-            // System.out.println("MyClass.class.getResource(File.separator +
-            // \"FILE_NAME\").getPath(): "
-            // + ED25519.class.getResource(File.separator + "FILE_NAME").getPath());
-            // System.out.println(
-            // "MyClass.class.getResource(\"..\" + File.separator + \"..\" + File.separator
-            // + FILE_NAME).getPath(): "
-            // + ED25519.class.getResource(".." + File.separator + ".." + File.separator +
-            // FILE_NAME)
-            // .getPath());
+            return signvalue;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return "";
+        }
+    }
+
+    public static String Sign(String nonce, String privatekey, String did, String payload, String SignToolPath) {
+        return Sign(nonce, privatekey, did, payload, true, SignToolPath);
+    }
+
+    public static String Verify(String nonce, String publickey, String did, String payload, String signed,
+            String SignToolPath) {
+        // ./verify-util -data MwlGskPlAadBU3rCt9V3sP4rzxANxrcL3IowfMi7lZU= -did
+        // did:axn:63946328-58a9-43cf-b370-a6da3a9059b9 -pubkey
+        // MwlGskPlAadBU3rCt9V3sP4rzxANxrcL3IowfMi7lZU= -nonce nonce -signed
+        // 4waUjnkwkzPV8EYiyFsbxkA5IgoqKQjVUVOL7eMIz4XLrISW8D2FkhlPrp9LT2V7X4HSHSTzLnoffYkPCgLtCA==
+        try {
+            Base64.Encoder encoder = Base64.getEncoder();
+            String base64_payload = encoder.encodeToString(payload.getBytes("UTF-8"));
+
+            String signvalue = "";
+
+            String cmd = SignToolPath + " -pubkey " + publickey + " -nonce " + nonce + " -did " + did + " -data "
+                    + base64_payload;
+            Runtime runtime = Runtime.getRuntime();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(runtime.exec(cmd).getInputStream()));
+
+            signvalue = br.readLine().trim();
 
             return signvalue;
         } catch (Exception e) {

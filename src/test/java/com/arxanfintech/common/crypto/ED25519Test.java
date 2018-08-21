@@ -51,8 +51,8 @@ public class ED25519Test extends TestCase {
     public void testSign() {
         try {
             String result = ED25519.Sign("nonce",
-                    "bx0jOwALZ0hLDxwyHyct3xoH4KjFL3wZ6dDYd2O6Bxmh0qnfEFLK9BjiCfwHoUkU/ryNMBbFWYz9HpFGgwKt6Q==",
-                    "did:axn:98e90bea-f4c3-4347-9656-d9e3a2b1bfe2", "{\"username\":\"vip\",\"password\":\"secret\"}",
+                    "uegxVd0IWKPJfNMUBhUm45JLeICLjJGGs2dqU1CLRZ0zCUayQ+UBp0FTesK31Xew/ivPEA3GtwvcijB8yLuVlQ==",
+                    "did:axn:63946328-58a9-43cf-b370-a6da3a9059b9", "47NyAoEhkpo2mK8Dr+ouIP2aWROMWZvYzbYwJOoyNew=",
                     "/Users/yan/eclipse-workspace/java-common/src/main/resources/sign-util");
             System.out.println("after sign: " + result);
             assertTrue(true);

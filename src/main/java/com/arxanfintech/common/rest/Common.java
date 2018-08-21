@@ -16,12 +16,14 @@ limitations under the License.
 
 package com.arxanfintech.common.rest;
 
+import org.spongycastle.util.encoders.Base64;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.arxanfintech.common.crypto.ED25519;
 
 public class Common {
-    public static JSONObject Build_Body(JSONObject payload, String did, String created, String nonce,
+    public static JSONObject BuildBody(JSONObject payload, String did, String created, String nonce,
             String privatekeyBase64, String signToolPath) {
         try {
             String signdata = ED25519.Sign(nonce, privatekeyBase64, did, payload.toJSONString(), signToolPath);
@@ -30,10 +32,21 @@ public class Common {
                     + nonce + "\", \"signature_value\": \"" + signdata + "\"}}";
 
             JSONObject jsonbody = JSON.parseObject(strdata);
-            System.out.println("Build_Body : " + strdata);
+            System.out.println("BuildBody : " + strdata);
             return jsonbody;
         } catch (Exception e) {
-            System.out.println("Build_Body error: " + e.getMessage());
+            System.out.println("BuildBody error: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public static String SignString(String base64Payload, String did, String created, String nonce,
+            String privatekeyBase64, String signToolPath) {
+        try {
+            String signdata = ED25519.Sign(nonce, privatekeyBase64, did, base64Payload, false, signToolPath);
+            return signdata;
+        } catch (Exception e) {
+            System.out.println("SignString error: " + e.getMessage());
             return null;
         }
     }

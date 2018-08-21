@@ -15,45 +15,29 @@ limitations under the License.
 *******************************************************************************/
 package com.arxanfintech.common.structs;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.http.Header;
-import org.apache.http.message.BasicHeader;
-
 public class Headers {
+    public static String UserIdHeader = "User-Id";
+    public static String UserRoleHeader = "User-Role";
+    public static String ChannelIdHeader = "Channel-Id";
+    public static String ChaincodeIdHeader = "Chaincode-Id";
+    public static String XAuthTokenHeader = "X-Auth-Token";
+    public static String XSubjectTokenHeader = "X-Subject-Token";
+    public static String ACLActionHeader = "ACL-Action";
+    public static String APIKeyHeader = "API-Key";
+    public static String EnrollmentIdHeader = "Enrollment-Id";
+    public static String CryptoModeHeader = "Crypto-Mode";
+    public static String AuthModeHeader = "Auth-Mode";
 
-    private String content_type = "application/cipher";
-    private String api_key;
-    private String accept = "application/json";
+    // defined a new auth mode to auth channel/chaincode, for we need auth token and
+    // channel/chaincode
+    public static String AuthChannelModeHeader = "Auth-ChCC-Mode";
 
-    public String getContent_type() {
-        return content_type;
-    }
-
-    public void setContent_type(String content_type) {
-        this.content_type = content_type;
-    }
-
-    public String getApi_key() {
-        return api_key;
-    }
-
-    public void setApi_key(String api_key) {
-        this.api_key = api_key;
-    }
-
-    public String getAccept() {
-        return accept;
-    }
-
-    public void setAccept(String accept) {
-        this.accept = accept;
-    }
-
-    public Header[] ToHeaderArray() {
-        Header[] headers = { new BasicHeader("Content-type", this.content_type), new BasicHeader("Accep", this.accept),
-                new BasicHeader("Api-Key", this.api_key) };
-        return headers;
-    }
+    // defined a new auth mode to auth SN
+    public static String AuthSNModeHeader = "Auth-SN-Mode";
+    public static String AuthEmailHeader = "Auth-Email";
+    public static String FileAuthTokenHeader = "Auth-Token";
+    public static String FabioRouteTagHeader = "Host";
+    public static String CallbackUrlHeader = "Callback-Url";
+    public static String RouteTagHeader = "Route-Tag";
+    public static String InvokeModeHeader = "Bc-Invoke-Mode";
 }

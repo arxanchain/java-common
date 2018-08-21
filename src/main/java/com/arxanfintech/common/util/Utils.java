@@ -14,11 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 *******************************************************************************/
 
-
 package com.arxanfintech.common.util;
 
 import org.spongycastle.util.encoders.DecoderException;
 import org.spongycastle.util.encoders.Hex;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 
 import java.lang.reflect.Array;
 import java.math.BigInteger;
@@ -29,10 +33,13 @@ import java.security.SecureRandom;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
@@ -42,7 +49,8 @@ public class Utils {
     private static SecureRandom random = new SecureRandom();
 
     /**
-     * @param number should be in form '0x34fabd34....'
+     * @param number
+     *            should be in form '0x34fabd34....'
      * @return String
      */
     public static BigInteger unifiedNumericToBigInteger(String number) {
@@ -50,7 +58,7 @@ public class Utils {
         boolean match = Pattern.matches("0[xX][0-9a-fA-F]+", number);
         if (!match)
             return (new BigInteger(number));
-        else{
+        else {
             number = number.substring(2);
             number = number.length() % 2 != 0 ? "0".concat(number) : number;
             byte[] numberBytes = Hex.decode(number);
@@ -59,10 +67,11 @@ public class Utils {
     }
 
     /**
-     * Return formatted Date String: yyyy.MM.dd HH:mm:ss
-     * Based on Unix's time() input in seconds
+     * Return formatted Date String: yyyy.MM.dd HH:mm:ss Based on Unix's time()
+     * input in seconds
      *
-     * @param timestamp seconds since start of Unix-time
+     * @param timestamp
+     *            seconds since start of Unix-time
      * @return String formatted as - yyyy.MM.dd HH:mm:ss
      */
     public static String longToDateTime(long timestamp) {
@@ -92,7 +101,9 @@ public class Utils {
     /**
      * Decodes a hex string to address bytes and checks validity
      *
-     * @param hex - a hex string of the address, e.g., 6c386a4b26f73c802f34673f7248bb118f97424a
+     * @param hex
+     *            - a hex string of the address, e.g.,
+     *            6c386a4b26f73c802f34673f7248bb118f97424a
      * @return - decode and validated address byte[]
      */
     public static byte[] addressStringToBytes(String hex) {
@@ -113,12 +124,14 @@ public class Utils {
     }
 
     /**
-     * @param addr length should be 20
+     * @param addr
+     *            length should be 20
      * @return short string represent 1f21c...
      */
     public static String getAddressShortString(byte[] addr) {
 
-        if (!isValidAddress(addr)) throw new Error("not an address");
+        if (!isValidAddress(addr))
+            throw new Error("not an address");
 
         String addrShort = Hex.toHexString(addr, 0, 3);
 
@@ -139,17 +152,20 @@ public class Utils {
         String version = System.getProperty("java.version");
 
         // on android this property equals to 0
-        if (version.equals("0")) return 0;
+        if (version.equals("0"))
+            return 0;
 
         int pos = 0, count = 0;
         for (; pos < version.length() && count < 2; pos++) {
-            if (version.charAt(pos) == '.') count++;
+            if (version.charAt(pos) == '.')
+                count++;
         }
         return Double.parseDouble(version.substring(0, pos - 1));
     }
 
     public static String getHashListShort(List<byte[]> blockHashes) {
-        if (blockHashes.isEmpty()) return "[]";
+        if (blockHashes.isEmpty())
+            return "[]";
 
         StringBuilder sb = new StringBuilder();
         String firstHash = Hex.toHexString(blockHashes.get(0));
@@ -169,7 +185,7 @@ public class Utils {
         return unixTime * 1000;
     }
 
-    public static <T> T[] mergeArrays(T[] ... arr) {
+    public static <T> T[] mergeArrays(T[]... arr) {
         int size = 0;
         for (T[] ts : arr) {
             size += ts.length;
@@ -184,11 +200,13 @@ public class Utils {
     }
 
     public static String align(String s, char fillChar, int targetLen, boolean alignRight) {
-        if (targetLen <= s.length()) return s;
+        if (targetLen <= s.length())
+            return s;
         String alignString = repeat("" + fillChar, targetLen - s.length());
         return alignRight ? alignString + s : s + alignString;
 
     }
+
     public static String repeat(String s, int n) {
         if (s.length() == 1) {
             byte[] bb = new byte[n];
@@ -196,8 +214,14 @@ public class Utils {
             return new String(bb);
         } else {
             StringBuilder ret = new StringBuilder();
-            for (int i = 0; i < n; i++) ret.append(s);
+            for (int i = 0; i < n; i++)
+                ret.append(s);
             return ret.toString();
         }
+    }
+
+    public static Map<String, String> JsonToMap(JSONObject json) throws JSONException {
+        Map<String, String> retMap = (Map<String, String>) JSON.parse(json.toJSONString());
+        return retMap;
     }
 }

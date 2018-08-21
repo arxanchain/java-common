@@ -25,22 +25,105 @@ import com.alibaba.fastjson.JSONObject;
  *
  */
 public class Client {
+    public Client(String apiKey, String certPath, String creator, String created, String nonce, String privateKey,
+            String address) {
+        this.initClient(apiKey, certPath, creator, created, nonce, privateKey, address, true, "wallet-ng");
+    }
+
+    public Client(String apiKey, String certPath, String creator, String created, String nonce, String privateKey,
+            String address, Boolean enableCrypto) {
+        this.initClient(apiKey, certPath, creator, created, nonce, privateKey, address, enableCrypto, "wallet-ng");
+    }
+
+    public Client(String apiKey, String certPath, String creator, String created, String nonce, String privateKey,
+            String address, Boolean enableCrypto, String routeTag) {
+        this.initClient(apiKey, certPath, creator, created, nonce, privateKey, address, enableCrypto, routeTag);
+    }
+
+    private void initClient(String apiKey, String certPath, String creator, String created, String nonce,
+            String privateKey, String address, Boolean enableCrypto, String routeTag) {
+        this.address = address;
+        this.apiKey = apiKey;
+        this.routeTag = routeTag;
+        this.certPath = certPath;
+        this.creator = creator;
+        this.created = created;
+        this.nonce = nonce;
+        this.privateB64 = privateKey;
+        this.enableCrypto = enableCrypto;
+    }
+
     // Address is the address of the Rest server
-    public String Address;
+    private String address;
+
+    public String GetAddress() {
+        return this.address;
+    }
 
     // ApiKey is the access key for ACL access api
-    public String ApiKey;
+    private String apiKey;
+
+    public String GetApiKey() {
+        return this.apiKey;
+    }
+
+    // RouteTag of every url
+    private String routeTag;
+
+    public String GetRouteTag() {
+        return this.routeTag;
+    }
+
+    public void SetRouteTag(String routeTag) {
+        this.routeTag = routeTag;
+    }
 
     // Cert Path
-    public String CertPath;
+    private String certPath;
 
-    public String Creator;
-    public String Nonce;
-    public String PrivateB64;
+    public String GetCertPath() {
+        return this.certPath;
+    }
+
+    private String creator;
+
+    public String GetCreator() {
+        return this.creator;
+    }
+
+    private String created;
+
+    public String GetCreated() {
+        return this.created;
+    }
+
+    private String nonce;
+
+    public String GetNonce() {
+        return this.nonce;
+    }
+
+    private String privateB64;
+
+    public String GetPrivateB64() {
+        return this.privateB64;
+    }
+
+    private Boolean enableCrypto;
+
+    public Boolean GetEnableCrypto() {
+        return this.enableCrypto;
+    }
 
     public JSONObject getEntParams() {
-        String strSignParams = "{\"creator\":\"" + this.Creator + "\",\"nonce\":\"" + this.Nonce
-                + "\",\"privateB64\":\"" + this.PrivateB64 + "\"}";
+        System.out.println(this.creator);
+        System.out.println(this.nonce);
+        System.out.println(this.privateB64);
+        System.out.println(this.created);
+
+        String strSignParams = "{\"creator\":\"" + this.creator + "\",\"nonce\":\"" + this.nonce
+                + "\",\"privateB64\":\"" + this.privateB64 + "\",\"created\":\"" + this.created + "\"}";
+        System.out.println(strSignParams);
         JSONObject ent_sign_params = JSON.parseObject(strSignParams);
 
         return ent_sign_params;
