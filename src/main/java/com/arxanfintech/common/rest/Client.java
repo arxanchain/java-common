@@ -25,16 +25,83 @@ import com.alibaba.fastjson.JSONObject;
  *
  */
 public class Client {
+
+    /***
+     * new Client
+     * 
+     * @param apiKey
+     *            **apikey** is set to the API access key applied on `ChainConsole`
+     *            management page
+     * @param certPath
+     *            **CertPath** is the path of your private key file and tls
+     *            certificate
+     * @param creator
+     *            the enterprise's wallet did
+     * @param created
+     *            the enterprise's wallet created
+     * @param nonce
+     *            the enterprise's wallet nonce
+     * @param privateKey
+     *            the enterprise's wallet private key base64
+     * @param address
+     *            **Address** is the IP address of the BAAS server entrance.
+     */
     public Client(String apiKey, String certPath, String creator, String created, String nonce, String privateKey,
             String address) {
         this.initClient(apiKey, certPath, creator, created, nonce, privateKey, address, true, "wallet-ng");
     }
 
+    /***
+     * new Client
+     * 
+     * @param apiKey
+     *            **apikey** is set to the API access key applied on `ChainConsole`
+     *            management page
+     * @param certPath
+     *            **CertPath** is the path of your private key file and tls
+     *            certificate
+     * @param creator
+     *            the enterprise's wallet did
+     * @param created
+     *            the enterprise's wallet created
+     * @param nonce
+     *            the enterprise's wallet nonce
+     * @param privateKey
+     *            the enterprise's wallet private key base64
+     * @param address
+     *            **Address** is the IP address of the BAAS server entrance.
+     * @param enableCrypto
+     *            true will enable crypt data. default for true
+     */
     public Client(String apiKey, String certPath, String creator, String created, String nonce, String privateKey,
             String address, Boolean enableCrypto) {
         this.initClient(apiKey, certPath, creator, created, nonce, privateKey, address, enableCrypto, "wallet-ng");
     }
 
+    /***
+     * new Client
+     * 
+     * @param apiKey
+     *            **apikey** is set to the API access key applied on `ChainConsole`
+     *            management page
+     * @param certPath
+     *            **CertPath** is the path of your private key file and tls
+     *            certificate
+     * @param creator
+     *            the enterprise's wallet did
+     * @param created
+     *            the enterprise's wallet created
+     * @param nonce
+     *            the enterprise's wallet nonce
+     * @param privateKey
+     *            the enterprise's wallet private key base64
+     * @param address
+     *            **Address** is the IP address of the BAAS server entrance.
+     * @param enableCrypto
+     *            true will enable crypt data. default for true
+     * @param routeTag
+     *            route tag. default for "wallet-ng"
+     */
     public Client(String apiKey, String certPath, String creator, String created, String nonce, String privateKey,
             String address, Boolean enableCrypto, String routeTag) {
         this.initClient(apiKey, certPath, creator, created, nonce, privateKey, address, enableCrypto, routeTag);
