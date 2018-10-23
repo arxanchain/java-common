@@ -4,7 +4,7 @@
 
 	<groupId>com.arxanfintech</groupId>
 	<artifactId>java-common</artifactId>
-	<version>2.1.1b</version>
+	<version>3.0</version>
 	<packaging>jar</packaging>
 
 	<name>java-common</name>
@@ -170,8 +170,8 @@
 	</scm>
 	<developers>
 		<developer>
-			<name>dongyan</name>
-			<email>dongyan@arxanfintech.com</email>
+			<name>arxanchain</name>
+			<email>dev@arxanfintech.com</email>
 			<url>https://github.com/arxanchain/java-common</url>
 		</developer>
 	</developers>

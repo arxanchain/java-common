@@ -52,7 +52,6 @@ public class ApiTest extends TestCase {
     public void testGet() {
         try {
             Api api = new Api();
-            api.NewHttpClient();
             Request get = new Request();
             get.url = "http://httpbin.org/get";
 
@@ -69,7 +68,6 @@ public class ApiTest extends TestCase {
     public void testPost() {
         try {
             Api api = new Api();
-            api.NewHttpClient();
             Request post = new Request();
             post.url = "http://httpbin.org/post";
             post.body = JSONObject.parseObject("{\"username\":\"vip\",\"password\":\"secret\"}");
