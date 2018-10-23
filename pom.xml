@@ -112,9 +112,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <profiles>
-        <profile>
-            <id>release</id>
             <build>
                 <plugins>
                     <plugin>
@@ -201,8 +198,6 @@
 
             </build>
 
-        </profile>
-    </profiles>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
