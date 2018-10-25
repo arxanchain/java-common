@@ -23,7 +23,6 @@ import junit.framework.TestSuite;
 import com.alibaba.fastjson.JSONObject;
 import com.arxanfintech.common.rest.Api;
 import com.arxanfintech.common.rest.Request;
-import org.apache.http.message.BasicNameValuePair;
 
 /**
  * Unit test for RestApi
@@ -54,10 +53,12 @@ public class ApiTest extends TestCase {
             Api api = new Api();
             Request get = new Request();
             get.url = "http://httpbin.org/get";
-
+            get.client = new Client("apikey",  "sign_params_creator", "sign_params_created",
+                    "sign_params_nonce", "sign_params_privatekeyBase64", "address");
             api.DoGet(get);
             assertTrue(true);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             assertTrue(false);
         }
     }
@@ -71,7 +72,8 @@ public class ApiTest extends TestCase {
             Request post = new Request();
             post.url = "http://httpbin.org/post";
             post.body = JSONObject.parseObject("{\"username\":\"vip\",\"password\":\"secret\"}");
-
+            post.client = new Client("apikey", "sign_params_creator", "sign_params_created",
+                    "sign_params_nonce", "sign_params_privatekeyBase64", "address");
             api.DoPost(post);
             assertTrue(true);
         } catch (Exception e) {

@@ -16,39 +16,16 @@ limitations under the License.
 
 package com.arxanfintech.common.rest;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.FileInputStream;
 import java.security.KeyStore;
 
-import javax.xml.ws.spi.http.HttpHandler;
-
-import org.apache.http.Header;
-import org.apache.http.HeaderElement;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.NameValuePair;
-import org.apache.http.ParseException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-import com.arxanfintech.common.crypto.Crypto;
 import com.arxanfintech.common.structs.Headers;
 import com.arxanfintech.common.util.Utils;
 
-import java.io.FileInputStream;
-import java.net.URLDecoder;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -57,19 +34,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.alibaba.fastjson.JSON;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-
-import com.alibaba.fastjson.JSONObject;
-
-import com.arxanfintech.common.crypto.Crypto;
 
 /**
  * 
@@ -145,35 +110,40 @@ public class Api {
     	}
     }
 
+    /**
+     * httpclient get
+     *
+     * @param request
+     *            http get info
+     * @return response data
+     */
     public String DoGet(Request request) throws Exception {
-        try {
-            Unirest.setHttpClient(this.httpclient);
+        Unirest.setHttpClient(httpclient);
 
-            Map<String, String> mapHeader = Utils.JsonToMap(request.header);
-            mapHeader.put(Headers.APIKeyHeader, request.client.GetApiKey());
-
-            if (request.client.GetRouteTag() != "") {
-                mapHeader.put(Headers.FabioRouteTagHeader, request.client.GetRouteTag());
-                mapHeader.put(Headers.RouteTagHeader, request.client.GetRouteTag());
-            }
-
-            HttpResponse<String> res = Unirest.get(request.url).headers(mapHeader).asString();
-            String respData = res.getBody();
-            System.out.println("Got remote cipher response: " + respData);
-
-            String oriData = "";
-            if (request.client.GetEnableCrypto()) {
-                oriData = request.crypto.decryptAndVerify(respData.getBytes());
-            } else {
-                oriData = respData;
-            }
-
-            return oriData;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-
+        if (request.client == null) {
+            throw new Exception("client must NOT null");
         }
-        return null;
+
+        Map<String, String> mapHeader = Utils.JsonToMap(request.header);
+        mapHeader.put(Headers.APIKeyHeader, request.client.GetApiKey());
+
+        if (request.client.GetRouteTag() != "") {
+            mapHeader.put(Headers.FabioRouteTagHeader, request.client.GetRouteTag());
+            mapHeader.put(Headers.RouteTagHeader, request.client.GetRouteTag());
+        }
+
+        HttpResponse<String> res = Unirest.get(request.url).headers(mapHeader).asString();
+        String respData = res.getBody();
+        System.out.println("Got remote cipher response: " + respData);
+
+        String oriData = "";
+        if (request.client.GetEnableCrypto()) {
+            oriData = request.crypto.decryptAndVerify(respData.getBytes());
+        } else {
+            oriData = respData;
+        }
+
+        return oriData;
     }
 
     /**
@@ -181,46 +151,46 @@ public class Api {
      *
      * @param request
      *            http post info
-     * @return response data error return null
+     * @return response data
      */
-    public String DoPost(Request request) {
-        try {
-            Unirest.setHttpClient(httpclient);
+    public String DoPost(Request request) throws Exception {
+        Unirest.setHttpClient(httpclient);
 
-            String buf = "";
-            if (request.client.GetEnableCrypto()) {
-                buf = request.crypto.signAndEncrypt(request.body.toString().getBytes());
-            } else {
-                buf = request.body.toString();
-            }
-
-            Map<String, String> mapHeader = Utils.JsonToMap(request.header);
-            mapHeader.put(Headers.APIKeyHeader, request.client.GetApiKey());
-
-            if (request.client.GetRouteTag() != "") {
-                mapHeader.put(Headers.FabioRouteTagHeader, request.client.GetRouteTag());
-                mapHeader.put(Headers.RouteTagHeader, request.client.GetRouteTag());
-            }
-
-            System.out.println("after sign and encrypt : " + buf);
-            HttpResponse<String> res = Unirest.post(request.url).headers(mapHeader).body(buf).asString();
-
-            String respData = res.getBody();
-
-            System.out.println("Got remote cipher response: " + respData);
-
-            String oriData = "";
-            if (request.client.GetEnableCrypto()) {
-                oriData = request.crypto.decryptAndVerify(respData.getBytes());
-            } else {
-                oriData = respData;
-            }
-
-            return oriData;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        if (request.client == null) {
+            throw new Exception("client must NOT null");
         }
-        return "";
+
+        String buf = "";
+        if (request.client.GetEnableCrypto()) {
+            buf = request.crypto.signAndEncrypt(request.body.toString().getBytes());
+        } else {
+            buf = request.body.toString();
+        }
+
+        Map<String, String> mapHeader = Utils.JsonToMap(request.header);
+        mapHeader.put(Headers.APIKeyHeader, request.client.GetApiKey());
+
+        if (request.client.GetRouteTag() != "") {
+            mapHeader.put(Headers.FabioRouteTagHeader, request.client.GetRouteTag());
+            mapHeader.put(Headers.RouteTagHeader, request.client.GetRouteTag());
+        }
+
+        System.out.println("after sign and encrypt : " + buf);
+        HttpResponse<String> res = Unirest.post(request.url).headers(mapHeader).body(buf).asString();
+
+        String respData = res.getBody();
+
+        System.out.println("Got remote cipher response: " + respData);
+
+        String oriData = "";
+        if (request.client.GetEnableCrypto()) {
+            oriData = request.crypto.decryptAndVerify(respData.getBytes());
+        } else {
+            oriData = respData;
+        }
+
+        return oriData;
+
     }
 
     /**
@@ -228,101 +198,44 @@ public class Api {
      *
      * @param request
      *            http post info
-     * @return response data error return null
+     * @return response data
      */
-    public String DoPut(Request request) {
-        try {
-            Unirest.setHttpClient(httpclient);
+    public String DoPut(Request request) throws Exception {
 
-            String buf = "";
-            if (request.client.GetEnableCrypto()) {
-                buf = request.crypto.signAndEncrypt(request.body.toString().getBytes());
-            } else {
-                buf = request.body.toString();
-            }
+        Unirest.setHttpClient(httpclient);
 
-            Map<String, String> mapHeader = Utils.JsonToMap(request.header);
-            mapHeader.put(Headers.APIKeyHeader, request.client.GetApiKey());
-
-            if (request.client.GetRouteTag() != "") {
-                mapHeader.put(Headers.FabioRouteTagHeader, request.client.GetRouteTag());
-                mapHeader.put(Headers.RouteTagHeader, request.client.GetRouteTag());
-            }
-
-            HttpResponse<String> res = Unirest.put(request.url).headers(mapHeader).body(buf).asString();
-
-            String respData = res.getBody();
-
-            System.out.println("Got remote cipher response: " + respData);
-
-            String oriData = "";
-            if (request.client.GetEnableCrypto()) {
-                oriData = request.crypto.decryptAndVerify(respData.getBytes());
-            } else {
-                oriData = respData;
-            }
-            return oriData;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        if (request.client == null) {
+            throw new Exception("client must NOT null");
         }
-        return "";
-    }
 
-    /**
-     * httpclient post file
-     *
-     * @param request
-     *            http post info
-     * @return response data error return null
-     */
-    public String DoUploadFile(Request request, String filename, String poeid, Boolean readonly) {
-        try {
-            Unirest.setHttpClient(httpclient);
-
-            String buf = "";
-            if (request.client.GetEnableCrypto()) {
-                buf = request.crypto.signAndEncrypt(request.body.toString().getBytes());
-            } else {
-                buf = request.body.toString();
-            }
-            Map<String, String> mapHeader = Utils.JsonToMap(request.header);
-            mapHeader.put(Headers.APIKeyHeader, request.client.GetApiKey());
-
-            if (request.client.GetRouteTag() != "") {
-                mapHeader.put(Headers.FabioRouteTagHeader, request.client.GetRouteTag());
-                mapHeader.put(Headers.RouteTagHeader, request.client.GetRouteTag());
-            }
-
-            HttpResponse<String> res = Unirest.post(request.url).headers(mapHeader).field("poe_id", poeid)
-                    .field("read_only", readonly).field("poe_file", filename).field("file", new File(filename))
-                    .asString();
-
-            // final InputStream stream = new FileInputStream(new
-            // File(getClass().getResource(filename).toURI()));
-            // final byte[] bytes = new byte[stream.available()];
-            // stream.read(bytes);
-            // stream.close();
-            // .field("file", bytes, filename)
-
-            // .field("file", new FileInputStream(new
-            // File(getClass().getResource(filename).toURI())),
-            // ContentType.APPLICATION_OCTET_STREAM, filename)
-
-            String respData = res.getBody();
-
-            System.out.println("Got remote cipher response: " + respData);
-
-            String oriData = "";
-            if (request.client.GetEnableCrypto()) {
-                oriData = request.crypto.decryptAndVerify(respData.getBytes());
-            } else {
-                oriData = respData;
-            }
-
-            return oriData;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        String buf = "";
+        if (request.client.GetEnableCrypto()) {
+            buf = request.crypto.signAndEncrypt(request.body.toString().getBytes());
+        } else {
+            buf = request.body.toString();
         }
-        return "";
+
+        Map<String, String> mapHeader = Utils.JsonToMap(request.header);
+        mapHeader.put(Headers.APIKeyHeader, request.client.GetApiKey());
+
+        if (request.client.GetRouteTag() != "") {
+            mapHeader.put(Headers.FabioRouteTagHeader, request.client.GetRouteTag());
+            mapHeader.put(Headers.RouteTagHeader, request.client.GetRouteTag());
+        }
+
+        HttpResponse<String> res = Unirest.put(request.url).headers(mapHeader).body(buf).asString();
+
+        String respData = res.getBody();
+
+        System.out.println("Got remote cipher response: " + respData);
+
+        String oriData = "";
+        if (request.client.GetEnableCrypto()) {
+            oriData = request.crypto.decryptAndVerify(respData.getBytes());
+        } else {
+            oriData = respData;
+        }
+        return oriData;
+
     }
 }
