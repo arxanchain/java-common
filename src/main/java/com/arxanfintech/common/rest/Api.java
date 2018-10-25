@@ -64,50 +64,57 @@ public class Api {
      *            password of trustKeystore
      * @since 3.0  
      */ 
-    public Api(String keyStorePath, String keyStorePasswd, String trustStorePath, String trustStorePasswd) throws Exception {
+    public Api(String keyStorePath, String keyStorePasswd, String trustStorePath, String trustStorePasswd) {
     	this.keyStorePath = keyStorePath;
     	this.keyStorePasswd = keyStorePasswd;
     	this.trustStorePath = trustStorePath;
     	this.trustStorePasswd = trustStorePasswd;
-    	
-    	httpclient = this.NewHttpsClient();
 	}
+    
+    public CloseableHttpClient getHttpClient() throws Exception {
+    	if(this.httpclient != null) {
+    		return this.httpclient;
+    	}
+    	
+    	if(this.keyStorePath == "" && this.trustStorePath == "") {
+    		return NewHttpClient();
+    	}
+    	
+  		return NewHttpsClient();
+    }
 
     // 双向认证需要提供 KeyStore 和 TrustStore
     private CloseableHttpClient NewHttpsClient() throws Exception {
-        if (httpclient == null) {
-        	// 设置keystory
-        	KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType()); // "jks/PKSC12"
-        	keyStore.load(new FileInputStream(keyStorePath), keyStorePasswd.toCharArray());
-        	KeyManagerFactory keymg = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        	keymg.init(keyStore, keyStorePasswd.toCharArray());
+        // 设置keystory
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType()); // "jks/PKSC12"
+        keyStore.load(new FileInputStream(keyStorePath), keyStorePasswd.toCharArray());
+        KeyManagerFactory keymg = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        keymg.init(keyStore, keyStorePasswd.toCharArray());
         	
-        	// 设置 trust keystory
-        	KeyStore trustKeyStore = KeyStore.getInstance(KeyStore.getDefaultType()); // "jks"
-        	trustKeyStore.load(new FileInputStream(trustStorePath), trustStorePasswd.toCharArray());
-        	TrustManagerFactory trustKeyMg = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()); // "SunX509"
-        	trustKeyMg.init(trustKeyStore);
+        // 设置 trust keystory
+        KeyStore trustKeyStore = KeyStore.getInstance(KeyStore.getDefaultType()); // "jks"
+        trustKeyStore.load(new FileInputStream(trustStorePath), trustStorePasswd.toCharArray());
+        TrustManagerFactory trustKeyMg = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()); // "SunX509"
+        trustKeyMg.init(trustKeyStore);
 
-        	// SSLContext 要用KeyManagerFactory和TrustManagerFactory对象来初始化
-        	SSLContext sslcontext = SSLContext.getInstance("TLS");
-        	sslcontext.init(keymg.getKeyManagers(), trustKeyMg.getTrustManagers(), null);
+        // SSLContext 要用KeyManagerFactory和TrustManagerFactory对象来初始化
+        SSLContext sslcontext = SSLContext.getInstance("TLS");
+        sslcontext.init(keymg.getKeyManagers(), trustKeyMg.getTrustManagers(), null);
         	
-            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
-            httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
-        }
-        return httpclient;
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+        this.httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+        return this.httpclient;
     }
     
     /**
      *  create http client
      * 
      */
-    public Api() throws Exception {
-    	if (this.httpclient == null) {
-    		SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-    		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
-    		this.httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
-    	}
+    public CloseableHttpClient NewHttpClient() throws Exception {
+    	SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
+    	SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+    	this.httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+    	return this.httpclient;
     }
 
     /**
@@ -118,7 +125,7 @@ public class Api {
      * @return response data
      */
     public String DoGet(Request request) throws Exception {
-        Unirest.setHttpClient(httpclient);
+        Unirest.setHttpClient(getHttpClient());
 
         if (request.client == null) {
             throw new Exception("client must NOT null");
@@ -154,7 +161,7 @@ public class Api {
      * @return response data
      */
     public String DoPost(Request request) throws Exception {
-        Unirest.setHttpClient(httpclient);
+        Unirest.setHttpClient(getHttpClient());
 
         if (request.client == null) {
             throw new Exception("client must NOT null");
@@ -201,8 +208,7 @@ public class Api {
      * @return response data
      */
     public String DoPut(Request request) throws Exception {
-
-        Unirest.setHttpClient(httpclient);
+        Unirest.setHttpClient(getHttpClient());
 
         if (request.client == null) {
             throw new Exception("client must NOT null");
