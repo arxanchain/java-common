@@ -16,6 +16,9 @@ limitations under the License.
 
 package com.arxanfintech.common.rest;
 
+import java.io.FileInputStream;
+import java.security.KeyStore;
+
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import com.mashape.unirest.http.HttpResponse;
@@ -25,7 +28,9 @@ import com.arxanfintech.common.util.Utils;
 
 import java.util.Map;
 
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -39,15 +44,70 @@ import org.apache.http.ssl.SSLContexts;
 public class Api {
 
     public CloseableHttpClient httpclient;
+    
+    // 双向认证需要的参数 手动导入证书
+    private String keyStorePath = "";
+    private String keyStorePasswd = "";
+    private String trustStorePath = "";
+    private String trustStorePasswd = "";
 
-    public CloseableHttpClient NewHttpClient() throws Exception {
+    /**
+     * create https client with root cert and client-key client-cert
+     * 
+     * @param keyStorePath
+     *            keystore of client cert
+     * @param keyStorePasswd
+     *            password of client keystore
+     * @param trustStorePath
+     *            keystore of server root cert
+     * @param trustStorePasswd
+     *            password of trustKeystore
+     * @since 3.0  
+     */ 
+    public Api(String keyStorePath, String keyStorePasswd, String trustStorePath, String trustStorePasswd) throws Exception {
+    	this.keyStorePath = keyStorePath;
+    	this.keyStorePasswd = keyStorePasswd;
+    	this.trustStorePath = trustStorePath;
+    	this.trustStorePasswd = trustStorePasswd;
+    	
+    	httpclient = this.NewHttpsClient();
+	}
+
+    // 双向认证需要提供 KeyStore 和 TrustStore
+    private CloseableHttpClient NewHttpsClient() throws Exception {
         if (httpclient == null) {
-            SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
+        	// 设置keystory
+        	KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType()); // "jks/PKSC12"
+        	keyStore.load(new FileInputStream(keyStorePath), keyStorePasswd.toCharArray());
+        	KeyManagerFactory keymg = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        	keymg.init(keyStore, keyStorePasswd.toCharArray());
+        	
+        	// 设置 trust keystory
+        	KeyStore trustKeyStore = KeyStore.getInstance(KeyStore.getDefaultType()); // "jks"
+        	trustKeyStore.load(new FileInputStream(trustStorePath), trustStorePasswd.toCharArray());
+        	TrustManagerFactory trustKeyMg = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()); // "SunX509"
+        	trustKeyMg.init(trustKeyStore);
 
+        	// SSLContext 要用KeyManagerFactory和TrustManagerFactory对象来初始化
+        	SSLContext sslcontext = SSLContext.getInstance("TLS");
+        	sslcontext.init(keymg.getKeyManagers(), trustKeyMg.getTrustManagers(), null);
+        	
             SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
-            CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+            httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
         }
         return httpclient;
+    }
+    
+    /**
+     *  create http client
+     * 
+     */
+    public Api() throws Exception {
+    	if (this.httpclient == null) {
+    		SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
+    		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+    		this.httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+    	}
     }
 
     /**
@@ -58,11 +118,6 @@ public class Api {
      * @return response data
      */
     public String DoGet(Request request) throws Exception {
-
-        SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
-        CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
         Unirest.setHttpClient(httpclient);
 
         if (request.client == null) {
@@ -99,11 +154,6 @@ public class Api {
      * @return response data
      */
     public String DoPost(Request request) throws Exception {
-
-        SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
-        CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
         Unirest.setHttpClient(httpclient);
 
         if (request.client == null) {
@@ -152,10 +202,6 @@ public class Api {
      */
     public String DoPut(Request request) throws Exception {
 
-        SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
-        CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
         Unirest.setHttpClient(httpclient);
 
         if (request.client == null) {

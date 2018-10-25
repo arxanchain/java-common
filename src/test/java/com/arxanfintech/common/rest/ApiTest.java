@@ -51,11 +51,10 @@ public class ApiTest extends TestCase {
     public void testGet() {
         try {
             Api api = new Api();
-            api.NewHttpClient();
             Request get = new Request();
             get.url = "http://httpbin.org/get";
-            get.client = new Client("apikey", "certpath", "sign_params_creator", "sign_params_created",
-                    "sign_params_nonce", "sign_params_privatekeyBase64", "address", false);
+            get.client = new Client("apikey",  "sign_params_creator", "sign_params_created",
+                    "sign_params_nonce", "sign_params_privatekeyBase64", "address");
             api.DoGet(get);
             assertTrue(true);
         } catch (Exception e) {
@@ -70,12 +69,11 @@ public class ApiTest extends TestCase {
     public void testPost() {
         try {
             Api api = new Api();
-            api.NewHttpClient();
             Request post = new Request();
             post.url = "http://httpbin.org/post";
             post.body = JSONObject.parseObject("{\"username\":\"vip\",\"password\":\"secret\"}");
-            post.client = new Client("apikey", "certpath", "sign_params_creator", "sign_params_created",
-                    "sign_params_nonce", "sign_params_privatekeyBase64", "address", false);
+            post.client = new Client("apikey", "sign_params_creator", "sign_params_created",
+                    "sign_params_nonce", "sign_params_privatekeyBase64", "address");
             api.DoPost(post);
             assertTrue(true);
         } catch (Exception e) {
