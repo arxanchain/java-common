@@ -76,11 +76,11 @@ public class Api {
     		return this.httpclient;
     	}
     	
-    	if(this.keyStorePath == "" && this.trustStorePath == "") {
-    		return NewHttpClient();
+    	if(this.keyStorePath != "" && this.trustStorePath != "") {
+    		return NewHttpsClient();
     	}
-    	
-  		return NewHttpsClient();
+
+    	return NewHttpClient();
     }
 
     // 双向认证需要提供 KeyStore 和 TrustStore
@@ -208,6 +208,7 @@ public class Api {
      * @return response data
      */
     public String DoPut(Request request) throws Exception {
+
         Unirest.setHttpClient(getHttpClient());
 
         if (request.client == null) {

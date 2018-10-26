@@ -100,7 +100,7 @@ public class Client {
         this.keyStorePath = keyStorePath;
         this.keyStorePasswd = keyStorePasswd;
         this.trustStorePath = trustStorePath;
-        this.keyStorePasswd = trustStorePasswd;
+        this.trustStorePasswd = trustStorePasswd;
     }
 
     // Address is the address of the Rest server
