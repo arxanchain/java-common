@@ -31,7 +31,7 @@ public class Client {
 	private String trustStorePasswd;
 
     /**
-     * new Client
+     * new Client, use two keystores store client cert and trust ca cert
      * 
      * @param apiKey
      *            **apikey** is set to the API access key applied on `ChainConsole`
@@ -62,6 +62,32 @@ public class Client {
         		keyStorePath, keyStorePasswd, trustStorePath, trustStorePasswd);
     }
 
+    /**
+     * new Client, just use one keystore store all certs
+     * 
+     * @param apiKey
+     *            **apikey** is set to the API access key applied on `ChainConsole`
+     *            management page
+     * @param creator
+     *            the enterprise's wallet did
+     * @param created
+     *            the enterprise's wallet created
+     * @param nonce
+     *            the enterprise's wallet nonce
+     * @param privateKey
+     *            the enterprise's wallet private key base64
+     * @param address
+     *            **Address** is the IP address of the BAAS server entrance.
+     * @param keyStorePath
+     *            keystore of client cert
+     * @param keyStorePasswd
+     *            password of client keystore
+     */
+    public Client(String apiKey, String creator, String created, String nonce, String privateKey,
+            String address,  String keyStorePath, String keyStorePasswd) {
+        this.initClient(apiKey, "", creator, created, nonce, privateKey, address, false, "wallet-ng",
+        		keyStorePath, keyStorePasswd, keyStorePath, keyStorePasswd);
+    }
     /**
      * new Client
      * 
