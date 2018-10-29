@@ -25,9 +25,13 @@ import com.alibaba.fastjson.JSONObject;
  *
  */
 public class Client {
+	private String keyStorePath;
+	private String keyStorePasswd;
+	private String trustStorePath;
+	private String trustStorePasswd;
 
-    /***
-     * new Client
+    /**
+     * new Client, use two keystores store client cert and trust ca cert
      * 
      * @param apiKey
      *            **apikey** is set to the API access key applied on `ChainConsole`
@@ -42,15 +46,49 @@ public class Client {
      *            the enterprise's wallet private key base64
      * @param address
      *            **Address** is the IP address of the BAAS server entrance.
-     * @param routeTag
-     *            route tag. default for "wallet-ng"
+     * @param keyStorePath
+     *            keystore of client cert
+     * @param keyStorePasswd
+     *            password of client keystore
+     * @param trustStorePath
+     *            keystore of server root cert
+     * @param trustStorePasswd
+     *            password of trustKeystore
      */
     public Client(String apiKey, String creator, String created, String nonce, String privateKey,
-            String address,  String routeTag) {
-        this.initClient(apiKey, "", creator, created, nonce, privateKey, address, false, routeTag);
+            String address,  String keyStorePath, String keyStorePasswd, 
+            String trustStorePath, String trustStorePasswd) {
+        this.initClient(apiKey, "", creator, created, nonce, privateKey, address, false, "wallet-ng",
+        		keyStorePath, keyStorePasswd, trustStorePath, trustStorePasswd);
     }
 
-    /* **
+    /**
+     * new Client, just use one keystore store all certs
+     * 
+     * @param apiKey
+     *            **apikey** is set to the API access key applied on `ChainConsole`
+     *            management page
+     * @param creator
+     *            the enterprise's wallet did
+     * @param created
+     *            the enterprise's wallet created
+     * @param nonce
+     *            the enterprise's wallet nonce
+     * @param privateKey
+     *            the enterprise's wallet private key base64
+     * @param address
+     *            **Address** is the IP address of the BAAS server entrance.
+     * @param keyStorePath
+     *            keystore of client cert
+     * @param keyStorePasswd
+     *            password of client keystore
+     */
+    public Client(String apiKey, String creator, String created, String nonce, String privateKey,
+            String address,  String keyStorePath, String keyStorePasswd) {
+        this.initClient(apiKey, "", creator, created, nonce, privateKey, address, false, "wallet-ng",
+        		keyStorePath, keyStorePasswd, keyStorePath, keyStorePasswd);
+    }
+    /**
      * new Client
      * 
      * @param apiKey
@@ -67,15 +105,15 @@ public class Client {
      * @param address
      *            **Address** is the IP address of the BAAS server entrance.
      *            
-     *  @since 3.0
      * */
     public Client(String apiKey, String creator, String created, String nonce, String privateKey,
             String address) {
-        this.initClient(apiKey, "", creator, created, nonce, privateKey, address, false, "wallet-ng");
+        this.initClient(apiKey, "", creator, created, nonce, privateKey, address, false, "wallet-ng", "", "", "", "");
     }
 
     private void initClient(String apiKey, String certPath, String creator, String created, String nonce,
-            String privateKey, String address, Boolean enableCrypto, String routeTag) {
+            String privateKey, String address, Boolean enableCrypto, String routeTag, 
+            String keyStorePath, String keyStorePasswd, String trustStorePath, String trustStorePasswd) {
         this.address = address;
         this.apiKey = apiKey;
         this.routeTag = routeTag;
@@ -85,6 +123,10 @@ public class Client {
         this.nonce = nonce;
         this.privateB64 = privateKey;
         this.enableCrypto = enableCrypto; // FIXME delete
+        this.keyStorePath = keyStorePath;
+        this.keyStorePasswd = keyStorePasswd;
+        this.trustStorePath = trustStorePath;
+        this.trustStorePasswd = trustStorePasswd;
     }
 
     // Address is the address of the Rest server
@@ -147,6 +189,22 @@ public class Client {
 
     public Boolean GetEnableCrypto() {
         return this.enableCrypto;
+    }
+
+    public String GetKeyStorePath() {
+    	return this.keyStorePath;
+    }
+
+    public String GetKeyStorePasswd() {
+    	return this.keyStorePasswd;
+    }
+
+    public String GetTrustStorePath() {
+    	return this.trustStorePath;
+    }
+
+    public String GetTrustStorePasswd() {
+    	return this.trustStorePasswd;
     }
 
     public JSONObject getEntParams() {

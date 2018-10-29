@@ -50,7 +50,7 @@ public class ApiTest extends TestCase {
      */
     public void testGet() {
         try {
-            Api api = new Api();
+            Api api = new Api("", "", "", "");
             Request get = new Request();
             get.url = "http://httpbin.org/get";
             get.client = new Client("apikey",  "sign_params_creator", "sign_params_created",
@@ -68,7 +68,7 @@ public class ApiTest extends TestCase {
      */
     public void testPost() {
         try {
-            Api api = new Api();
+            Api api = new Api("", "", "", "");
             Request post = new Request();
             post.url = "http://httpbin.org/post";
             post.body = JSONObject.parseObject("{\"username\":\"vip\",\"password\":\"secret\"}");
